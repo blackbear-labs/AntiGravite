@@ -1,7 +1,20 @@
 import os
 import sys
+import shutil
 import subprocess
 from pathlib import Path
+
+# Resolve FFmpeg binary (prefer system ffmpeg, fallback to imageio_ffmpeg)
+def find_ffmpeg():
+    if shutil.which("ffmpeg"):
+        return "ffmpeg"
+    try:
+        import imageio_ffmpeg
+        return imageio_ffmpeg.get_ffmpeg_exe()
+    except ImportError:
+        return "ffmpeg"
+
+FFMPEG_BIN = find_ffmpeg()
 
 BASE_DIR = Path(__file__).resolve().parent
 ASSETS_DIR = BASE_DIR / "assets"
@@ -75,7 +88,7 @@ def ensure_directories():
 def create_placeholder_image(filepath, text, color="1a1a2e"):
     """Creates a high-contrast placeholder image if the user hasn't generated the real image yet."""
     cmd = [
-        "ffmpeg", "-y",
+        FFMPEG_BIN, "-y",
         "-f", "lavfi",
         "-i", f"color=c=0x{color}:s={WIDTH}x{HEIGHT}:d=1",
         "-vf", f"drawtext=text='{text}':fontsize=56:fontcolor=white:x=(w-text_w)/2:y=(h-text_h)/2:box=1:boxcolor=black@0.6:boxborderw=20",
@@ -105,7 +118,8 @@ def render_video():
     rendered_clips = []
     
     total_duration = sum(s["duration"] for s in SCENES)
-    print(f"\n🚀 [1/3] Preparing 7 scenes (Total Target Duration: {total_duration}s)...")
+    print(f"\n🚀 [1/3] Using FFmpeg: {FFMPEG_BIN}")
+    print(f"       Preparing 7 scenes (Target Duration: {total_duration}s)...")
     
     colors = ["1a1a2e", "251f47", "1b263b", "102a43", "2c1930", "1c2826", "231b1b"]
     for i, scene in enumerate(SCENES):
@@ -128,7 +142,7 @@ def render_video():
         )
 
         cmd = [
-            "ffmpeg", "-y",
+            FFMPEG_BIN, "-y",
             "-loop", "1",
             "-i", str(img_path),
             "-vf", filter_chain,
@@ -152,14 +166,14 @@ def render_video():
     audio_path = AUDIO_DIR / "voiceover.mp3"
     
     cmd_concat = [
-        "ffmpeg", "-y",
+        FFMPEG_BIN, "-y",
         "-f", "concat",
         "-safe", "0",
         "-i", str(concat_file),
     ]
 
     if audio_path.exists():
-        print("   🎙️ Merging voiceover.mp3...")
+        print(f"   🎙️ Merging voiceover.mp3 ({audio_path})...")
         cmd_concat.extend(["-i", str(audio_path), "-c:a", "aac", "-shortest"])
     else:
         print("   ℹ️ No voiceover.mp3 found in assets/audio/ (video rendered mute).")
