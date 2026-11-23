@@ -1,0 +1,32 @@
+name: Generate Motion Video
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-video:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install FFmpeg
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+
+      - name: Generate Motion Video
+        run: |
+          python create_motion_video.py
+
+      - name: Upload Output Video
+        uses: actions/upload-artifact@v4
+        with:
+          name: what-if-motion-video
+          path: output/final_what_if_video.mp4
