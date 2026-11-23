@@ -1,5 +1,6 @@
 .temp/
 .temp_viral/
+.temp_motion_engine/
 output/
 __pycache__/
 *.pyc

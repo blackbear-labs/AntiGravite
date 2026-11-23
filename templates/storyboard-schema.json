@@ -1,0 +1,156 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "WhatIfKineticStoryboardSchema",
+  "description": "Schema for kinetic micro-beat storyboard specifications separating vector motion rendering from FFmpeg post-muxing.",
+  "type": "object",
+  "required": [
+    "project_header",
+    "voiceover_script",
+    "beats"
+  ],
+  "properties": {
+    "project_header": {
+      "type": "object",
+      "required": [
+        "title",
+        "premise",
+        "target_duration_sec",
+        "aspect_ratio",
+        "visual_style",
+        "current_stage"
+      ],
+      "properties": {
+        "title": { "type": "string" },
+        "premise": { "type": "string" },
+        "target_duration_sec": { "type": "number", "minimum": 1 },
+        "aspect_ratio": { "type": "string", "enum": ["9:16", "16:9"] },
+        "visual_style": {
+          "type": "string",
+          "default": "Dark Luxury / High-Contrast Editorial",
+          "examples": [
+            "Dark Luxury / High-Contrast Editorial",
+            "Monochrome Minimal",
+            "Kinetic Glow",
+            "3D Editorial"
+          ]
+        },
+        "current_stage": {
+          "type": "string",
+          "enum": [
+            "Stage 1: Script & Micro-Beat Plan",
+            "Stage 2: Timing-Locked Spec",
+            "Stage 3: Surgical Beat Patching",
+            "Stage 4: Final Mux & Export"
+          ]
+        }
+      }
+    },
+    "voiceover_script": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["cue_id", "spoken_text"],
+        "properties": {
+          "cue_id": { "type": "string" },
+          "spoken_text": { "type": "string" },
+          "intonation_cue": { "type": "string" }
+        }
+      }
+    },
+    "beats": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "beat_id",
+          "start_sec",
+          "end_sec",
+          "timing_source",
+          "spoken_phrase",
+          "on_screen_text",
+          "visual_element",
+          "motion_primitive",
+          "easing",
+          "from_state",
+          "to_state",
+          "render_engine",
+          "post_engine"
+        ],
+        "properties": {
+          "beat_id": { "type": "string", "pattern": "^beat_[0-9]{2,}$" },
+          "start_sec": { "type": "number", "minimum": 0 },
+          "end_sec": { "type": "number", "minimum": 0 },
+          "timing_source": {
+            "type": "string",
+            "enum": ["word-level-json", "estimated"]
+          },
+          "spoken_phrase": { "type": "string" },
+          "on_screen_text": {
+            "type": "string",
+            "description": "Punchy callout, max 1-5 words"
+          },
+          "visual_element": {
+            "type": "string",
+            "description": "Vector icon, geometric shape, kinetic headline, axis/meter, HUD frame"
+          },
+          "motion_primitive": {
+            "type": "string",
+            "enum": [
+              "type_snap",
+              "stroke_draw",
+              "shape_morph",
+              "spring_pop",
+              "vector_drift",
+              "impact_slam",
+              "radial_flash",
+              "counter_roll",
+              "path_trim",
+              "glitch_displace"
+            ]
+          },
+          "easing": {
+            "type": "string",
+            "examples": [
+              "cubic-bezier(0.22, 1, 0.36, 1)",
+              "spring(stiffness: 300, damping: 20)",
+              "ease-out",
+              "linear"
+            ]
+          },
+          "from_state": {
+            "type": "object",
+            "properties": {
+              "opacity": { "type": "number" },
+              "scale": { "type": "number" },
+              "x": { "type": "number" },
+              "y": { "type": "number" },
+              "rotation": { "type": "number" },
+              "strokeDashoffset": { "type": "number" },
+              "accentColor": { "type": "string" }
+            }
+          },
+          "to_state": {
+            "type": "object",
+            "properties": {
+              "opacity": { "type": "number" },
+              "scale": { "type": "number" },
+              "x": { "type": "number" },
+              "y": { "type": "number" },
+              "rotation": { "type": "number" },
+              "strokeDashoffset": { "type": "number" },
+              "accentColor": { "type": "string" }
+            }
+          },
+          "render_engine": {
+            "type": "string",
+            "const": "kinetic-renderer"
+          },
+          "post_engine": {
+            "type": "string",
+            "const": "ffmpeg"
+          }
+        }
+      }
+    }
+  }
+}
