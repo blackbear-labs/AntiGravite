@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "WhatIfKineticStoryboardSchema",
-  "description": "Schema for kinetic micro-beat storyboard specifications separating vector motion rendering from FFmpeg post-muxing.",
+  "description": "Schema for kinetic micro-beat storyboard specifications separating Remotion/Lottie vector motion rendering from FFmpeg post-muxing.",
   "type": "object",
   "required": [
     "project_header",
@@ -40,7 +40,7 @@
             "Stage 1: Script & Micro-Beat Plan",
             "Stage 2: Timing-Locked Spec",
             "Stage 3: Surgical Beat Patching",
-            "Stage 4: Final Mux & Export"
+            "Stage 4: Headless Remotion Render & FFmpeg Mux"
           ]
         }
       }
@@ -93,6 +93,11 @@
             "type": "string",
             "description": "Vector icon, geometric shape, kinetic headline, axis/meter, HUD frame"
           },
+          "remotion_component": {
+            "type": "string",
+            "description": "Remotion React component name mapping to this micro-beat",
+            "examples": ["StatusBadge", "KineticHeadline", "DataCounter", "LottieWrapper", "MetricBox"]
+          },
           "motion_primitive": {
             "type": "string",
             "enum": [
@@ -111,8 +116,9 @@
           "easing": {
             "type": "string",
             "examples": [
+              "cubic-bezier(0.16, 1, 0.3, 1)",
               "cubic-bezier(0.22, 1, 0.36, 1)",
-              "spring(stiffness: 300, damping: 20)",
+              "spring({ damping: 15, mass: 0.8, stiffness: 200 })",
               "ease-out",
               "linear"
             ]
@@ -126,7 +132,8 @@
               "y": { "type": "number" },
               "rotation": { "type": "number" },
               "strokeDashoffset": { "type": "number" },
-              "accentColor": { "type": "string" }
+              "accentColor": { "type": "string" },
+              "val": { "type": ["number", "string"] }
             }
           },
           "to_state": {
@@ -138,12 +145,13 @@
               "y": { "type": "number" },
               "rotation": { "type": "number" },
               "strokeDashoffset": { "type": "number" },
-              "accentColor": { "type": "string" }
+              "accentColor": { "type": "string" },
+              "val": { "type": ["number", "string"] }
             }
           },
           "render_engine": {
             "type": "string",
-            "const": "kinetic-renderer"
+            "const": "remotion"
           },
           "post_engine": {
             "type": "string",
